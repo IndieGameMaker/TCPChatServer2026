@@ -36,6 +36,9 @@ public class ChatServer
         _listener.Start();
         _isRunning = true;
         
+        // 백그라운드 스레드로 클라이언 연결을 수락시작
+        _ = Task.Run(AcceptClientAsync);
+        
         Console.WriteLine($"서버가 정상적으로 실행되었습니다. 포트:{_port}");
     }
     
