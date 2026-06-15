@@ -25,6 +25,9 @@ public class ConnectedClient : IDisposable
     // 클라이언트 연결 여부
     public bool IsConnected => !_isDisposed && _client.Connected;
 
+    // 메시지 수신 이벤트
+    public event Action<ConnectedClient, string> MessageReceived;
+    
     // 생성자
     public ConnectedClient(TcpClient client)
     {
@@ -58,6 +61,9 @@ public class ConnectedClient : IDisposable
                     break;
                 }
                 
+                // 브로드캐스트 이벤트 발행
+                MessageReceived?.Invoke(this, message);
+                
                 Console.WriteLine($"[수신] {_clientId} : {message}");
             }
         }
@@ -71,10 +77,22 @@ public class ConnectedClient : IDisposable
         }
     }
     
+    // 메시지 송신
+    public async Task SendMessageAsync(string message)
+    {
+        if (!_isDisposed || !IsConnected) return;
+        await _writer.WriteLineAsync(message);
+    }
+    
     public void Dispose()
     {
         if (_isDisposed) return;
         _isDisposed = true;
+        
+        _reader.Dispose();
+        _writer.Dispose();
+        _stream.Dispose();
+        
         _client.Dispose();
         _stream.Dispose();
     }

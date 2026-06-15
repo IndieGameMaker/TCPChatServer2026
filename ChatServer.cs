@@ -81,6 +81,9 @@ public class ChatServer
                 // Indexer 방식
                 _connectedClients[connectedClient.ClientId] = connectedClient;
                 
+                // 메시지 수신 시 브로드캐스트를 위한 이벤트 연결(구독)
+                connectedClient.MessageReceived += OnMessageReceived;
+                
                 // 클라이언트로 부터 메시지 수신 시작(비동기)
                 _ = Task.Run(connectedClient.ReceiveMessageAsync);
                 
@@ -90,6 +93,28 @@ public class ChatServer
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+            }
+        }
+    }
+
+    private void OnMessageReceived(ConnectedClient sender, string message)
+    {
+        // 메시지 포맷 
+        // [발신자 ID] 메시지
+        
+        string msg = $"[{sender.ClientId}]  {message}";
+        
+        // 모든 클라이언트에게 메시지 브로드캐스팅
+        _ = Task.Run(() => BroadcastMessageAsync(msg));
+    }
+
+    private async Task BroadcastMessageAsync(string message)
+    {
+        foreach (var client in _connectedClients.Values)
+        {
+            if (client.IsConnected)
+            {
+                // 전송 메시지 호출
             }
         }
     }
