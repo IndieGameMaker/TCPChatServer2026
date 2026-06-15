@@ -81,6 +81,9 @@ public class ChatServer
                 // Indexer 방식
                 _connectedClients[connectedClient.ClientId] = connectedClient;
                 
+                // 클라이언트로 부터 메시지 수신 시작(비동기)
+                _ = Task.Run(connectedClient.ReceiveMessageAsync);
+                
                 // 접속한 클라이언트 수 출력
                 Console.WriteLine($"[정보] 현재 접속한 클라이언트 수 : {_connectedClients.Count}");
             }
