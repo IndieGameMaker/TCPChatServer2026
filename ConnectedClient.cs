@@ -22,6 +22,10 @@ public class ConnectedClient : IDisposable
     
     // 클라이언트 ID 프로퍼티
     public string ClientId => _clientId;
+    
+    // 닉네임 프로퍼티 (Auto Property)
+    public string NickName { get; set; }
+    
     // 클라이언트 연결 여부
     public bool IsConnected => !_isDisposed && _client.Connected;
 

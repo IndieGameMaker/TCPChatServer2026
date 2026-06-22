@@ -114,6 +114,16 @@ public class ChatServer
 
     private void OnMessageReceived(ConnectedClient sender, string message)
     {
+        // 프로토콜 파싱 : Google ProtoBuf 사용
+        // NICK:Zack
+        if (message.StartsWith("NICK:"))
+        {
+            string nickName = message.Substring("NICK:".Length); // nickName = message.split(':')[1]
+            sender.NickName = nickName;
+            Console.WriteLine($"[닉네임 설정] {sender.ClientId}의 닉네임을 {nickName}으로 설정");
+            return;
+        }
+        
         // 메시지 포맷 
         // [발신자 ID] 메시지
         
