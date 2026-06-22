@@ -118,19 +118,30 @@ public class ChatServer
         // NICK:Zack
         if (message.StartsWith("NICK:"))
         {
-            string nickName = message.Substring("NICK:".Length); // nickName = message.split(':')[1]
+            string nickName = message.Substring("NICK:".Length); // nickName = message.Split(':')[1]
             sender.NickName = nickName;
             Console.WriteLine($"[닉네임 설정] {sender.ClientId}의 닉네임을 {nickName}으로 설정");
             return;
         }
         
-        // 메시지 포맷 
-        // [발신자 ID] 메시지
+        // 브로드캐스팅 할 메시지 생성
+        // CHAT:닉네임:채팅메시지
+        if (message.StartsWith("CHAT:"))
+        {
+            var chatMsg = message.Split(':', 3);
+            if (chatMsg.Length == 3)
+            {
+                string nickName = chatMsg[1];
+                string chatMessage = chatMsg[2];
+                string msg = $"[{nickName}] {chatMessage}";
+                
+                // 모든 클라이언트에게 메시지 브로드캐스팅
+                Console.WriteLine($"[브로드캐스팅] {msg}");
+                _ = Task.Run(() => BroadcastMessageAsync(msg));
+                
+            }
+        }
         
-        string msg = $"[{sender.ClientId}]  {message}";
-        
-        // 모든 클라이언트에게 메시지 브로드캐스팅
-        _ = Task.Run(() => BroadcastMessageAsync(msg));
     }
 
     private async Task BroadcastMessageAsync(string message)
